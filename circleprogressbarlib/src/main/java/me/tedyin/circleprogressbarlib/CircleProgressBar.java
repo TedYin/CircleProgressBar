@@ -2,23 +2,18 @@ package me.tedyin.circleprogressbarlib;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ComposeShader;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.RadialGradient;
 import android.graphics.RectF;
 import android.graphics.Shader;
+import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.View;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 圆形进度条
@@ -26,29 +21,35 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class CircleProgressBar extends View {
 
+    private static final String KEY_INSTANCE_STATE = "instance_state";
+    private static final String KEY_STATE_CURRENT_PROGRESS = "state_current_progress";
+    private static final String KEY_STATE_ANGLE_STEP = "state_angle_step";
+    private static final String KEY_STATE_NEED_SHOW_TEXT = "state_need_show_text";
+    private static final String KEY_STATE_NEED_ANIM = "state_need_anim";
+
     private static final float MAX_PROGRESS = 100f;
-
+    private static Handler mHandler = new Handler(Looper.getMainLooper());
     private Context mContext;
-
-    private int mCurrentProgress = 0;
-    private int mLastProgress = mCurrentProgress;
 
     private int mCpbProgressColor = Color.parseColor("#0dfb7d");
     private int mCpbProgressBackgroundColor = Color.parseColor("#4aa6f5");
     private int mCpbProgressTextColor = mCpbProgressColor;
     private int mCpbBackgroundColor = Color.parseColor("#7df5f5f5");
-    private int mStrokeWidth = 16;
-    private int mMinWidth;
-
-    private AtomicBoolean isStartLoading = new AtomicBoolean(false);
+    private int mCpbStrokeWidth = 8;// 默认ProgressBar宽度
+    private int mCpbStartAngle = -90;// 12点方向
+    private boolean mCpbNeedAnim = true;// 默认开启动画
+    private boolean mCpbNeedShowText = true;
 
     //画圆所在的距形区域
     private RectF mRectF, mBgRectF;
-    private Shader mShader;// todo test
-
     private Paint mCpbBgPaint;
     private Paint mCpbPaint;
     private Paint mCpbTextPaint;
+    private int mAngleStep = 0;
+    private int mMinWidth;
+    private int mCurrentProgress = 0;
+    private int[] mColorScheme;
+    private AnimRunnable mAnimRunnable;
 
     public CircleProgressBar(Context context) {
         super(context);
@@ -69,40 +70,76 @@ public class CircleProgressBar extends View {
         mCpbProgressBackgroundColor = a.getColor(R.styleable.CircleProgressBar_cpbBackgroundProgressColor, mCpbProgressBackgroundColor);
         mCpbBackgroundColor = a.getColor(R.styleable.CircleProgressBar_cpbBackgroundColor, mCpbBackgroundColor);
         mCpbProgressTextColor = a.getColor(R.styleable.CircleProgressBar_cpbProgressTextColor, mCpbProgressTextColor);
-        mStrokeWidth = a.getInt(R.styleable.CircleProgressBar_cpbStrokeWidth, mStrokeWidth);
+        mCpbStrokeWidth = a.getInt(R.styleable.CircleProgressBar_cpbStrokeWidth, mCpbStrokeWidth);
+        mCpbStartAngle = a.getInt(R.styleable.CircleProgressBar_cpbStartAngle, mCpbStartAngle);
+        mCpbNeedAnim = a.getBoolean(R.styleable.CircleProgressBar_cpbNeedAnim, mCpbNeedAnim);
+        mCpbNeedShowText = a.getBoolean(R.styleable.CircleProgressBar_cpbNeedAnim, mCpbNeedShowText);
         a.recycle();
     }
 
     private void init() {
-        // init background paint
+        initBackgroundPaint();
+        initFillPaint();
+        initTextPaint();
+        initRectF();
+        initAnim();
+    }
+
+    // init background paint
+    private void initBackgroundPaint() {
         mCpbBgPaint = new Paint();
         mCpbBgPaint.setAntiAlias(true);
-        mCpbBgPaint.setStyle(Paint.Style.STROKE);// todo
-        mCpbBgPaint.setStrokeWidth(mStrokeWidth);
+        mCpbBgPaint.setStyle(Paint.Style.STROKE);
+        mCpbBgPaint.setStrokeWidth(mCpbStrokeWidth);
         mCpbBgPaint.setColor(mCpbBackgroundColor);
+    }
 
-        // init fill paint
+    // init fill paint
+    private void initFillPaint() {
         mCpbPaint = new Paint();
         mCpbPaint.setAntiAlias(true);
         mCpbPaint.setDither(true);
-        mCpbPaint.setStyle(Paint.Style.STROKE);// todo
+        mCpbPaint.setStyle(Paint.Style.STROKE);
         mCpbPaint.setStrokeCap(Paint.Cap.ROUND);
-        mCpbPaint.setStrokeWidth(mStrokeWidth);
+        mCpbPaint.setStrokeWidth(mCpbStrokeWidth);
         mCpbPaint.setColor(mCpbProgressColor);
+    }
 
-        // init text paint
+    // init text paint
+    private void initTextPaint() {
         mCpbTextPaint = new Paint();
         mCpbTextPaint.setAntiAlias(true);
         mCpbTextPaint.setColor(mCpbProgressTextColor);
+    }
 
-        // init rect
+    // init rectF
+    private void initRectF() {
         mBgRectF = new RectF();
         mRectF = new RectF();
+    }
+
+    // init Animation Runnable
+    private void initAnim() {
+        if (mCpbNeedAnim) {
+            mAnimRunnable = new AnimRunnable();
+        }
+    }
+
+    // init shader
+    private void initShader() {
+        if (mColorScheme == null || mColorScheme.length == 0) return;
+        float end = mMinWidth - mCpbStrokeWidth / 2;
+        Shader shader = new LinearGradient(0, 0, end, end, mColorScheme, null,
+                Shader.TileMode.CLAMP);
+        mCpbPaint.setShader(shader);
+        if (mCpbProgressTextColor == mCpbProgressColor || !mCpbNeedShowText) return;
+        mCpbTextPaint.setShader(shader);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        startAnimIfNeed();
     }
 
     @Override
@@ -110,28 +147,33 @@ public class CircleProgressBar extends View {
         super.onLayout(changed, left, top, right, bottom);
         if (changed) {
             mMinWidth = Math.min(getWidth(), getHeight());
-            int rLeft = mStrokeWidth / 2;
-            int rTop = mStrokeWidth / 2;
-            int rRight = mMinWidth - mStrokeWidth / 2;
-            int rBottom = mMinWidth - mStrokeWidth / 2;
+            int rLeft = mCpbStrokeWidth / 2;
+            int rTop = mCpbStrokeWidth / 2;
+            int rRight = mMinWidth - mCpbStrokeWidth / 2;
+            int rBottom = mMinWidth - mCpbStrokeWidth / 2;
             mBgRectF.set(rLeft, rTop, rRight, rBottom);
             mRectF.set(rLeft, rTop, rRight, rBottom);
+            initShader();
         }
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawArc(mBgRectF, 0, 360, true, mCpbBgPaint);
+        drawCircleBgProgress(canvas);
         drawCircleProgress(canvas);
         drawProgressText(canvas);
     }
 
+    private void drawCircleBgProgress(Canvas canvas) {
+        canvas.drawArc(mBgRectF, 0, 360, true, mCpbBgPaint);
+    }
+
     private void drawProgressText(Canvas canvas) {
+        if (!mCpbNeedShowText) return;
         String text = String.valueOf(mCurrentProgress);
-        int textSize = (int) ((mMinWidth - mStrokeWidth * 2) / 2.5);
+        int textSize = (int) ((mMinWidth - mCpbStrokeWidth * 2) / 2.5);
         mCpbTextPaint.setTextSize(textSize);
-        if (mShader != null) mCpbTextPaint.setShader(mShader);
         Paint.FontMetrics fm = mCpbTextPaint.getFontMetrics();
         float textHeight = (float) Math.ceil(fm.descent - fm.top);
         float textWidth = mCpbTextPaint.measureText(text);
@@ -142,10 +184,59 @@ public class CircleProgressBar extends View {
     }
 
     private void drawCircleProgress(Canvas canvas) {
-        int startAngle = (int) ((mLastProgress / MAX_PROGRESS) * 360 - 90);//从12点方向开始画
+        int startAngle = mAngleStep + mCpbStartAngle;
         int sweepAngle = (int) ((mCurrentProgress / MAX_PROGRESS) * 360);//从12点方向开始画
         canvas.drawArc(mRectF, startAngle, sweepAngle, false, mCpbPaint);
-        mLastProgress = mCurrentProgress;
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        if (mAnimRunnable != null) {
+            mHandler.removeCallbacks(mAnimRunnable);
+        }
+    }
+
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        Bundle state = new Bundle();
+        state.putParcelable(KEY_INSTANCE_STATE, super.onSaveInstanceState());
+        state.putInt(KEY_STATE_CURRENT_PROGRESS, mCurrentProgress);
+        state.putInt(KEY_STATE_ANGLE_STEP, mAngleStep);
+        state.putBoolean(KEY_STATE_NEED_SHOW_TEXT, mCpbNeedShowText);
+        state.putBoolean(KEY_STATE_NEED_ANIM, mCpbNeedAnim);
+        return state;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        if (state instanceof Bundle) {
+            Bundle bundle = (Bundle) state;
+            mCurrentProgress = bundle.getInt(KEY_STATE_CURRENT_PROGRESS);
+            mAngleStep = bundle.getInt(KEY_STATE_ANGLE_STEP);
+            mCpbNeedAnim = bundle.getBoolean(KEY_STATE_NEED_ANIM);
+            mCpbNeedShowText = bundle.getBoolean(KEY_STATE_NEED_SHOW_TEXT);
+            super.onRestoreInstanceState(bundle.getParcelable(KEY_INSTANCE_STATE));
+        } else {
+            super.onRestoreInstanceState(state);
+        }
+    }
+
+    private void startAnimIfNeed() {
+        if (mCpbNeedAnim) {
+            mHandler.post(mAnimRunnable);
+        }
+    }
+
+    private class AnimRunnable implements Runnable {
+        @Override
+        public void run() {
+            if (mCurrentProgress < MAX_PROGRESS) {
+                mAngleStep += 2;
+                invalidate();
+                mHandler.postDelayed(this, 13);
+            }
+        }
     }
 
     /**
@@ -161,21 +252,18 @@ public class CircleProgressBar extends View {
 
     public void setProgress(int progress) {
         this.mCurrentProgress = progress;
-        invalidateUi();
+        if (!mCpbNeedAnim) {
+            invalidateUi();
+        }
     }
 
-    // 测试Shader的使用情况
-    void shaderTest() {
-        Bitmap bmp = BitmapFactory.decodeResource(getResources(), android.R.drawable.alert_dark_frame);
-        Shader mShader0 = new BitmapShader(bmp, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
-        // 线性渐变
-        Shader mShader1 = new LinearGradient(0, 0, 100, 100, new int[]{
-                Color.YELLOW, Color.GREEN, Color.BLUE, Color.RED}, null,
-                Shader.TileMode.MIRROR);
-        // 环形渐变
-        Shader mShader2 = new RadialGradient(0, 0, 200, Color.YELLOW, Color.RED, Shader.TileMode.CLAMP);
-        // 组合渐变
-        mShader = new ComposeShader(mShader0, mShader1, PorterDuff.Mode.LIGHTEN);
+    /**
+     * 设置Color 模式
+     *
+     * @param colorScheme 颜色值
+     */
+    public void setColorScheme(int... colorScheme) {
+        mColorScheme = colorScheme;
     }
 }
 

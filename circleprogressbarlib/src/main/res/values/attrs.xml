@@ -5,6 +5,9 @@
         <attr name="cpbBackgroundProgressColor" format="color|reference" />
         <attr name="cpbProgressTextColor" format="color|reference" />
         <attr name="cpbBackgroundColor" format="color|reference" />
-        <attr name="cpbStrokeWidth" format="integer|reference" />
+        <attr name="cpbStrokeWidth" format="integer" />
+        <attr name="cpbStartAngle" format="integer" />
+        <attr name="cpbNeedAnim" format="boolean" />
+        <attr name="cpbNeedShowText" format="boolean" />
     </declare-styleable>
 </resources>

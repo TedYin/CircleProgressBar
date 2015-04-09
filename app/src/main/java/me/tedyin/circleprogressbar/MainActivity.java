@@ -1,6 +1,7 @@
 package me.tedyin.circleprogressbar;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -21,13 +22,14 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         bar1 = (CircleProgressBar) findViewById(R.id.bar1);
         bar2 = (CircleProgressBar) findViewById(R.id.bar2);
+        bar1.setColorScheme(Color.GREEN, Color.YELLOW, Color.RED);
         text = (TextView) findViewById(R.id.text);
         findViewById(R.id.btn).setOnClickListener(new ClickL());
     }
 
     void delay() {
         try {
-            Thread.sleep(20);
+            Thread.sleep(200);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -42,7 +44,7 @@ public class MainActivity extends Activity {
                 @Override
                 public void run() {
                     super.run();
-                    while (current < 80) {
+                    while (current < 100) {
                         current += 1;
                         bar1.setProgress(current);
                         bar2.setProgress(current);
