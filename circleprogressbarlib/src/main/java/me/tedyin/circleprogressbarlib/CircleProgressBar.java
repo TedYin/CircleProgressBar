@@ -32,7 +32,6 @@ public class CircleProgressBar extends View {
     private Context mContext;
 
     private int mCpbProgressColor = Color.parseColor("#0dfb7d");
-    private int mCpbProgressBackgroundColor = Color.parseColor("#4aa6f5");
     private int mCpbProgressTextColor = mCpbProgressColor;
     private int mCpbBackgroundColor = Color.parseColor("#7df5f5f5");
     private int mCpbStrokeWidth = 8;// 默认ProgressBar宽度
@@ -50,6 +49,7 @@ public class CircleProgressBar extends View {
     private int mCurrentProgress = 0;
     private int[] mColorScheme;
     private AnimRunnable mAnimRunnable;
+    private LoadingCallBack mLoadingCallBack;
 
     public CircleProgressBar(Context context) {
         super(context);
@@ -67,7 +67,6 @@ public class CircleProgressBar extends View {
     private void parseAttributes(AttributeSet attrs) {
         TypedArray a = mContext.obtainStyledAttributes(attrs, R.styleable.CircleProgressBar);
         mCpbProgressColor = a.getColor(R.styleable.CircleProgressBar_cpbProgressColor, mCpbProgressColor);
-        mCpbProgressBackgroundColor = a.getColor(R.styleable.CircleProgressBar_cpbBackgroundProgressColor, mCpbProgressBackgroundColor);
         mCpbBackgroundColor = a.getColor(R.styleable.CircleProgressBar_cpbBackgroundColor, mCpbBackgroundColor);
         mCpbProgressTextColor = a.getColor(R.styleable.CircleProgressBar_cpbProgressTextColor, mCpbProgressTextColor);
         mCpbStrokeWidth = a.getInt(R.styleable.CircleProgressBar_cpbStrokeWidth, mCpbStrokeWidth);
@@ -224,6 +223,7 @@ public class CircleProgressBar extends View {
 
     private void startAnimIfNeed() {
         if (mCpbNeedAnim) {
+            mHandler.removeCallbacks(mAnimRunnable);
             mHandler.post(mAnimRunnable);
         }
     }
@@ -235,6 +235,11 @@ public class CircleProgressBar extends View {
                 mAngleStep += 2;
                 invalidate();
                 mHandler.postDelayed(this, 13);
+            } else {
+                mHandler.removeCallbacks(this);
+                if (mLoadingCallBack != null) {
+                    mLoadingCallBack.loadingComplete(CircleProgressBar.this);
+                }
             }
         }
     }
@@ -251,7 +256,7 @@ public class CircleProgressBar extends View {
     }
 
     public void setProgress(int progress) {
-        this.mCurrentProgress = progress;
+        this.mCurrentProgress = progress > MAX_PROGRESS ? (int) MAX_PROGRESS : progress;
         if (!mCpbNeedAnim) {
             invalidateUi();
         }
@@ -264,6 +269,19 @@ public class CircleProgressBar extends View {
      */
     public void setColorScheme(int... colorScheme) {
         mColorScheme = colorScheme;
+    }
+
+    /**
+     * 加载完成回调
+     *
+     * @param callBack 回调
+     */
+    public void setLoadingCallBack(LoadingCallBack callBack) {
+        this.mLoadingCallBack = callBack;
+    }
+
+    public interface LoadingCallBack {
+        public void loadingComplete(View v);
     }
 }
 

@@ -7,16 +7,14 @@
     android:gravity="center"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/text"
-        android:text="@string/hello_world"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
     <me.tedyin.circleprogressbarlib.CircleProgressBar
         app:cpbStrokeWidth="10"
         app:cpbNeedAnim="false"
         app:cpbNeedShowText="false"
+        app:cpbBackgroundColor="#9000"
+        app:cpbProgressTextColor="#ffffff"
+        app:cpbProgressColor="#0b90cf"
+        app:cpbStartAngle="-120"
         android:id="@+id/bar1"
         android:layout_height="56dp"
         android:layout_width="56dp" />
