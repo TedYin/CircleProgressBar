@@ -8,5 +8,6 @@
         <attr name="cpbStartAngle" format="integer" />
         <attr name="cpbNeedAnim" format="boolean" />
         <attr name="cpbNeedShowText" format="boolean" />
+        <attr name="cpbMaxAngle" format="integer"/>
     </declare-styleable>
 </resources>

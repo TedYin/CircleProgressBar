@@ -32,14 +32,14 @@ public class CircleProgressBar extends View {
     private Context mContext;
 
     private int mCpbProgressColor = Color.parseColor("#0dfb7d");
-    private int mCpbProgressTextColor = mCpbProgressColor;
+    private int mCpbProgressTextColor;
     private int mCpbBackgroundColor = Color.parseColor("#7df5f5f5");
-    private int mCpbStrokeWidth = 8;// 默认ProgressBar宽度
-    private int mCpbStartAngle = -90;// 12点方向
-    private boolean mCpbNeedAnim = true;// 默认开启动画
-    private boolean mCpbNeedShowText = true;
+    private int mCpbStrokeWidth = 10;// default stroke width
+    private int mCpbStartAngle = -90;// default 12 o'clock
+    private int mCpbMaxAngle = 360;// default complete circle
+    private boolean mCpbNeedAnim = true;// default start anim
+    private boolean mCpbNeedShowText = true;// default show text
 
-    //画圆所在的距形区域
     private RectF mRectF, mBgRectF;
     private Paint mCpbBgPaint;
     private Paint mCpbPaint;
@@ -71,8 +71,12 @@ public class CircleProgressBar extends View {
         mCpbProgressTextColor = a.getColor(R.styleable.CircleProgressBar_cpbProgressTextColor, mCpbProgressTextColor);
         mCpbStrokeWidth = a.getInt(R.styleable.CircleProgressBar_cpbStrokeWidth, mCpbStrokeWidth);
         mCpbStartAngle = a.getInt(R.styleable.CircleProgressBar_cpbStartAngle, mCpbStartAngle);
+        mCpbMaxAngle = a.getInt(R.styleable.CircleProgressBar_cpbMaxAngle, mCpbMaxAngle);
+        mCpbNeedShowText = a.getBoolean(R.styleable.CircleProgressBar_cpbNeedShowText, mCpbNeedShowText);
         mCpbNeedAnim = a.getBoolean(R.styleable.CircleProgressBar_cpbNeedAnim, mCpbNeedAnim);
-        mCpbNeedShowText = a.getBoolean(R.styleable.CircleProgressBar_cpbNeedAnim, mCpbNeedShowText);
+
+        mCpbNeedAnim = mCpbMaxAngle % 360 == 0 && mCpbNeedAnim;
+        mCpbProgressTextColor = mCpbProgressTextColor == 0 ? mCpbProgressColor : mCpbProgressTextColor;
         a.recycle();
     }
 
@@ -131,7 +135,7 @@ public class CircleProgressBar extends View {
         Shader shader = new LinearGradient(0, 0, end, end, mColorScheme, null,
                 Shader.TileMode.CLAMP);
         mCpbPaint.setShader(shader);
-        if (mCpbProgressTextColor == mCpbProgressColor || !mCpbNeedShowText) return;
+        if (mCpbProgressTextColor != mCpbProgressColor || !mCpbNeedShowText) return;
         mCpbTextPaint.setShader(shader);
     }
 
@@ -165,7 +169,7 @@ public class CircleProgressBar extends View {
     }
 
     private void drawCircleBgProgress(Canvas canvas) {
-        canvas.drawArc(mBgRectF, 0, 360, true, mCpbBgPaint);
+        canvas.drawArc(mBgRectF, mCpbStartAngle, mCpbMaxAngle, false, mCpbBgPaint);
     }
 
     private void drawProgressText(Canvas canvas) {
@@ -184,7 +188,7 @@ public class CircleProgressBar extends View {
 
     private void drawCircleProgress(Canvas canvas) {
         int startAngle = mAngleStep + mCpbStartAngle;
-        int sweepAngle = (int) ((mCurrentProgress / MAX_PROGRESS) * 360);//从12点方向开始画
+        int sweepAngle = (int) ((mCurrentProgress / MAX_PROGRESS) * mCpbMaxAngle);
         canvas.drawArc(mRectF, startAngle, sweepAngle, false, mCpbPaint);
     }
 
@@ -245,7 +249,7 @@ public class CircleProgressBar extends View {
     }
 
     /**
-     * 刷新View
+     * invalidate view
      */
     public void invalidateUi() {
         if (Looper.getMainLooper() == Looper.myLooper()) {
@@ -263,18 +267,18 @@ public class CircleProgressBar extends View {
     }
 
     /**
-     * 设置Color 模式
+     * set color scheme
      *
-     * @param colorScheme 颜色值
+     * @param colorScheme colors
      */
     public void setColorScheme(int... colorScheme) {
         mColorScheme = colorScheme;
     }
 
     /**
-     * 加载完成回调
+     * loading complete callback
      *
-     * @param callBack 回调
+     * @param callBack callback
      */
     public void setLoadingCallBack(LoadingCallBack callBack) {
         this.mLoadingCallBack = callBack;
