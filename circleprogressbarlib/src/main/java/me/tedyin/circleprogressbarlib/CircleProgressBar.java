@@ -181,7 +181,6 @@ public class CircleProgressBar extends View {
         float textHeight = (float) Math.ceil(fm.descent - fm.top);
         float textWidth = mCpbTextPaint.measureText(text);
         float x = (mMinWidth - textWidth) / 2;
-        //文字绘制时，绘制位置应设置为文字底部的位置
         float y = (mMinWidth - textHeight) / 2 + textSize;
         canvas.drawText(text, x, y, mCpbTextPaint);
     }

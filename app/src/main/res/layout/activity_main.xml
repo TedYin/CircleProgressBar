@@ -8,22 +8,36 @@
     tools:context=".MainActivity">
 
     <me.tedyin.circleprogressbarlib.CircleProgressBar
-        app:cpbStrokeWidth="10"
-        app:cpbNeedAnim="false"
-        app:cpbNeedShowText="false"
-        app:cpbBackgroundColor="#9000"
-        app:cpbProgressTextColor="#ffffff"
-        app:cpbProgressColor="#0b90cf"
-        app:cpbStartAngle="-120"
         android:id="@+id/bar1"
+        app:cpbStrokeWidth="10"
+        app:cpbBackgroundColor="#9000"
+        app:cpbProgressColor="#0b90cf"
+        app:cpbProgressTextColor="#ffaabb"
+        app:cpbNeedAnim="false"
         android:layout_height="56dp"
         android:layout_width="56dp" />
 
     <me.tedyin.circleprogressbarlib.CircleProgressBar
         android:id="@+id/bar2"
+        app:cpbProgressTextColor="#7f7f70"
         app:cpbStrokeWidth="20"
         android:layout_height="56dp"
         android:layout_width="56dp" />
+
+    <me.tedyin.circleprogressbarlib.CircleProgressBar
+        android:id="@+id/bar3"
+        app:cpbStrokeWidth="20"
+        app:cpbMaxAngle="270"
+        app:cpbStartAngle="-225"
+        android:layout_height="88dp"
+        android:layout_width="88dp" />
+
+    <me.tedyin.circleprogressbarlib.CircleProgressBar
+        android:id="@+id/bar4"
+        app:cpbStrokeWidth="30"
+        app:cpbNeedAnim="false"
+        android:layout_height="88dp"
+        android:layout_width="88dp" />
 
     <Button
         android:id="@+id/btn"
