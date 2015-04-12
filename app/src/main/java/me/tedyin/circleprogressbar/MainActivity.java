@@ -11,7 +11,7 @@ import me.tedyin.circleprogressbarlib.CircleProgressBar;
 
 public class MainActivity extends Activity {
 
-    CircleProgressBar bar1, bar2, bar3,bar4;
+    CircleProgressBar bar1, bar2, bar3, bar4;
     static int current;
 
     @Override
@@ -38,7 +38,7 @@ public class MainActivity extends Activity {
 
     void delay() {
         try {
-            Thread.sleep(50);
+            Thread.sleep(20);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
