@@ -9,7 +9,7 @@
 
     <me.tedyin.circleprogressbarlib.CircleProgressBar
         android:id="@+id/bar1"
-        app:cpbStrokeWidth="10"
+        app:cpbStrokeWidth="15"
         app:cpbBackgroundColor="#9000"
         app:cpbProgressColor="#0b90cf"
         app:cpbProgressTextColor="#ffaabb"
