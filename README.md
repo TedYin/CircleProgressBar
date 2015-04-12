@@ -1,7 +1,7 @@
 # CircleProgressBar
 An android ProgressBar widget .
 
-![loading](https://github.com/TedYin/CircleProgressBar/loading.gif)
+![loading](https://tedyin.github.io/images/loading.gif)
 
 # Usage
 Layout xml
