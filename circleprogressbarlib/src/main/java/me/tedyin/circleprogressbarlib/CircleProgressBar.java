@@ -234,17 +234,24 @@ public class CircleProgressBar extends View {
     private class AnimRunnable implements Runnable {
         @Override
         public void run() {
-            if (mCurrentProgress < MAX_PROGRESS) {
-                mAngleStep += 2;
-                invalidate();
-                mHandler.postDelayed(this, 13);
-            } else {
+            if (mCurrentProgress >= MAX_PROGRESS) {
+                mCurrentProgress = (int) MAX_PROGRESS;
+                invalidateView();
                 mHandler.removeCallbacks(this);
                 if (mLoadingCallBack != null) {
                     mLoadingCallBack.loadingComplete(CircleProgressBar.this);
                 }
+            } else {
+                invalidateView();
+                mHandler.postDelayed(this, 13);
             }
         }
+
+        private void invalidateView(){
+            mAngleStep += 2;
+            invalidate();
+        }
+
     }
 
     /**
