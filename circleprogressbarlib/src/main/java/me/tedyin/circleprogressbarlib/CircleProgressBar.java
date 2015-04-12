@@ -225,8 +225,11 @@ public class CircleProgressBar extends View {
     }
 
     private void startAnimIfNeed() {
-        if (mCpbNeedAnim) {
+        if (mAnimRunnable != null) {
             mHandler.removeCallbacks(mAnimRunnable);
+        }
+
+        if (mCpbNeedAnim) {
             mHandler.post(mAnimRunnable);
         }
     }
@@ -243,11 +246,11 @@ public class CircleProgressBar extends View {
                 }
             } else {
                 invalidateView();
-                mHandler.postDelayed(this, 13);
+                mHandler.postDelayed(this, 12);
             }
         }
 
-        private void invalidateView(){
+        private void invalidateView() {
             mAngleStep += 2;
             invalidate();
         }

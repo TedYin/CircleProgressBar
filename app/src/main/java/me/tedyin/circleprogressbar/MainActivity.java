@@ -11,7 +11,7 @@ import me.tedyin.circleprogressbarlib.CircleProgressBar;
 
 public class MainActivity extends Activity {
 
-    CircleProgressBar bar1, bar2, bar3, bar4;
+    CircleProgressBar bar1, bar2, bar3;
     static int current;
 
     @Override
@@ -21,10 +21,8 @@ public class MainActivity extends Activity {
         bar1 = (CircleProgressBar) findViewById(R.id.bar1);
         bar2 = (CircleProgressBar) findViewById(R.id.bar2);
         bar3 = (CircleProgressBar) findViewById(R.id.bar3);
-        bar4 = (CircleProgressBar) findViewById(R.id.bar4);
 
         bar2.setColorScheme(Color.GREEN, Color.YELLOW, Color.RED);
-        bar4.setColorScheme(Color.GREEN, Color.YELLOW, Color.RED);
 
         bar2.setLoadingCallBack(new CircleProgressBar.LoadingCallBack() {
             @Override
@@ -38,7 +36,7 @@ public class MainActivity extends Activity {
 
     void delay() {
         try {
-            Thread.sleep(20);
+            Thread.sleep(50);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -48,7 +46,7 @@ public class MainActivity extends Activity {
         @Override
         public void onClick(View v) {
             current = 0;
-            bar2.requestLayout();
+            bar1.requestLayout();
             new Thread() {
                 @Override
                 public void run() {
@@ -58,7 +56,6 @@ public class MainActivity extends Activity {
                         bar1.setProgress(current);
                         bar2.setProgress(current);
                         bar3.setProgress(current);
-                        bar4.setProgress(current);
                         delay();
                     }
                 }

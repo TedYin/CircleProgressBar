@@ -13,31 +13,23 @@
         app:cpbBackgroundColor="#9000"
         app:cpbProgressColor="#0b90cf"
         app:cpbProgressTextColor="#ffaabb"
-        app:cpbNeedAnim="false"
         android:layout_height="56dp"
         android:layout_width="56dp" />
 
     <me.tedyin.circleprogressbarlib.CircleProgressBar
         android:id="@+id/bar2"
-        app:cpbProgressTextColor="#7f7f70"
+        app:cpbNeedAnim="false"
         app:cpbStrokeWidth="20"
-        android:layout_height="56dp"
-        android:layout_width="56dp" />
+        android:layout_height="80dp"
+        android:layout_width="80dp" />
 
     <me.tedyin.circleprogressbarlib.CircleProgressBar
         android:id="@+id/bar3"
         app:cpbStrokeWidth="20"
         app:cpbMaxAngle="270"
         app:cpbStartAngle="-225"
-        android:layout_height="88dp"
-        android:layout_width="88dp" />
-
-    <me.tedyin.circleprogressbarlib.CircleProgressBar
-        android:id="@+id/bar4"
-        app:cpbStrokeWidth="30"
-        app:cpbNeedAnim="false"
-        android:layout_height="88dp"
-        android:layout_width="88dp" />
+        android:layout_height="100dp"
+        android:layout_width="100dp" />
 
     <Button
         android:id="@+id/btn"
