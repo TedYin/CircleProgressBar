@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
-version = "1.0.0"
+version = "0.5.1"
 android {
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
@@ -10,7 +10,7 @@ android {
         minSdkVersion 11
         targetSdkVersion 22
         versionCode 1
-        versionName "1.0.0"
+        versionName "0.5.1"
     }
     buildTypes {
         release {
@@ -47,7 +47,7 @@ install {
                     developer {
                         id 'TedYin'		//填写的一些基本信息
                         name 'TedYin'
-                        email 'water-cs@qq.com'
+                        email 'tedworld.time@gmail.com'
                     }
                 }
                 scm {

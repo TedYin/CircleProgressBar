@@ -1,7 +1,12 @@
 # CircleProgressBar
 An android ProgressBar widget .
 
+[ ![Download](https://api.bintray.com/packages/tedyin/maven/CircleProgressBar/images/download.svg) ](https://bintray.com/tedyin/maven/CircleProgressBar/_latestVersion)
+
 ![loading](https://tedyin.github.io/images/loading.gif)
+
+# Gradle
+> compile 'me.tedyin.circleprogressbarlib:circleprogressbarlib:0.5.1'
 
 # Usage
 Layout xml
