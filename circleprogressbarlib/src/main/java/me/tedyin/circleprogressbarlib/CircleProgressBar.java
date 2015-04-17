@@ -145,13 +145,18 @@ public class CircleProgressBar extends View {
 
     // init shader
     private void initShader() {
-        if (mColorScheme == null || mColorScheme.length == 0) return;
-        float end = mMinWidth - mCpbStrokeWidth / 2;
-        Shader shader = new LinearGradient(0, 0, end, end, mColorScheme, null,
-                Shader.TileMode.CLAMP);
-        mCpbPaint.setShader(shader);
-        if (mCpbProgressTextColor != mCpbProgressColor || !mCpbNeedShowText) return;
-        mCpbTextPaint.setShader(shader);
+        Shader colorShader = null;
+        // init color shader
+        if (mColorScheme != null && mColorScheme.length != 0) {
+            float end = mMinWidth - mCpbStrokeWidth / 2;
+            colorShader = new LinearGradient(0, 0, end, end, mColorScheme, null,
+                    Shader.TileMode.CLAMP);
+        }
+
+        // set shader
+        if (colorShader != null) {
+            setShader(colorShader);
+        }
     }
 
     @Override
@@ -270,6 +275,12 @@ public class CircleProgressBar extends View {
             invalidate();
         }
 
+    }
+
+    private void setShader(Shader shader) {
+        mCpbPaint.setShader(shader);
+        if (mCpbProgressTextColor != mCpbProgressColor || !mCpbNeedShowText) return;
+        mCpbTextPaint.setShader(shader);
     }
 
     /**
