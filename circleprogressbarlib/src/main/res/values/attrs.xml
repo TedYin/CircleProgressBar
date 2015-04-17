@@ -8,6 +8,21 @@
         <attr name="cpbStartAngle" format="integer" />
         <attr name="cpbNeedAnim" format="boolean" />
         <attr name="cpbNeedShowText" format="boolean" />
-        <attr name="cpbMaxAngle" format="integer"/>
+        <attr name="cpbMaxAngle" format="integer" />
+    </declare-styleable>
+
+    <declare-styleable name="LineProgressBar">
+        <attr name="lpbBackgroundColor" format="color|reference" />
+        <attr name="lpbProgressImage" format="reference" />
+        <attr name="lpbProgressColor" format="color|reference" />
+        <attr name="lpbProgressTextColor" format="color|reference" />
+        <attr name="lpbNeedShowText" format="boolean" />
+        <attr name="lpbNeedAnim" format="boolean" />
+        <attr name="lpbImageWidth" format="dimension|reference" />
+        <attr name="lpbImageHeight" format="dimension|reference" />
+        <attr name="lpbOrientation" format="enum" >
+            <enum name="horizontal" value="0"/>
+            <enum name="vertical" value="1"/>
+        </attr>
     </declare-styleable>
 </resources>

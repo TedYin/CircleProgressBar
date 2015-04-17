@@ -31,6 +31,18 @@
         android:layout_height="100dp"
         android:layout_width="100dp" />
 
+    <me.tedyin.circleprogressbarlib.LineProgressBar
+        android:id="@+id/line"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:lpbProgressImage="@mipmap/icon"
+        android:layout_width="wrap_content"
+        app:lpbImageWidth="100dp"
+        app:lpbImageHeight="100dp"
+         />
+
+
     <Button
         android:id="@+id/btn"
         android:layout_width="wrap_content"
