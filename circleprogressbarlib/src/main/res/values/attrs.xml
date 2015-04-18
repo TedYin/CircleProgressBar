@@ -14,6 +14,7 @@
     <declare-styleable name="LineProgressBar">
         <attr name="lpbBackgroundColor" format="color|reference" />
         <attr name="lpbProgressImage" format="reference" />
+        <attr name="lpbSecondaryProgressImage" format="reference" />
         <attr name="lpbProgressColor" format="color|reference" />
         <attr name="lpbProgressTextColor" format="color|reference" />
         <attr name="lpbNeedShowText" format="boolean" />

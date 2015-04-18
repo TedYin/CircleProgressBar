@@ -37,9 +37,10 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         app:lpbProgressImage="@mipmap/icon"
+        app:lpbSecondaryProgressImage="@mipmap/icon_black"
         android:layout_width="wrap_content"
-        app:lpbImageWidth="100dp"
-        app:lpbImageHeight="100dp"
+        app:lpbImageWidth="200dp"
+        app:lpbImageHeight="200dp"
          />
 
 

@@ -24,8 +24,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.Build;
+import android.os.Bundle;
 import android.os.Looper;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -35,10 +36,16 @@ import android.view.View;
  */
 public class LineProgressBar extends View {
 
+    private static final String KEY_INSTANCE_STATE = "instance_state";
+    private static final String KEY_STATE_CURRENT_PROGRESS = "state_current_progress";
+    private static final String KEY_STATE_NEED_SHOW_TEXT = "state_need_show_text";
+    private static final String KEY_STATE_NEED_ANIM = "state_need_anim";
+    private static final String KEY_STATE_ORIENTATION = "state_orientation";
+
     private static final float MAX_PROGRESS = 100f;
 
     private int mLpbBackgroundColor = Color.BLACK;
-    private Bitmap mLpbProgressImage;
+    private Bitmap mLpbProgressImage, mLpbSecondaryProgressImage;
     private int mLpbProgressColor = Color.RED;
     private int mLpbProgressTextColor = Color.WHITE;
     private boolean mLpbNeedShowText = true;
@@ -89,11 +96,13 @@ public class LineProgressBar extends View {
         mLpbImageHeight = a.getDimension(R.styleable.LineProgressBar_lpbImageHeight, mLpbImageHeight);
         int orientation = a.getInteger(R.styleable.LineProgressBar_lpbOrientation, Orientation.horizontal.getValue());
         BitmapDrawable progressImage = (BitmapDrawable) a.getDrawable(R.styleable.LineProgressBar_lpbProgressImage);
+        BitmapDrawable secondImage = (BitmapDrawable) a.getDrawable(R.styleable.LineProgressBar_lpbSecondaryProgressImage);
         a.recycle();
 
         mLpbOrientation = orientation == Orientation.horizontal.getValue()
                 ? Orientation.horizontal : Orientation.vertical;
         mLpbProgressImage = progressImage != null ? progressImage.getBitmap() : null;
+        mLpbSecondaryProgressImage = secondImage != null ? secondImage.getBitmap() : null;
         resizeImageIfNeed();
     }
 
@@ -104,34 +113,31 @@ public class LineProgressBar extends View {
     }
 
     private void initBackgroundPaint() {
-        mBackgroundPaint = new Paint();
-        mBackgroundPaint.setColor(mLpbBackgroundColor);
-        mBackgroundPaint.setAntiAlias(true);
-        mBackgroundPaint.setStyle(Paint.Style.FILL);
-        Bitmap resultBmp = getBlackWhiteBmp(mLpbProgressImage);
-        if (resultBmp != null) {
-            BitmapShader backgroundShader = new BitmapShader(resultBmp
-                    , Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
-            mBackgroundPaint.setShader(backgroundShader);
-        }
+        mBackgroundPaint = initImagePaint(mLpbSecondaryProgressImage, mLpbBackgroundColor);
     }
 
     private void initProgressPaint() {
-        mProgressPaint = new Paint();
-        mProgressPaint.setAntiAlias(true);
-        mProgressPaint.setDither(true);
-        mProgressPaint.setColor(mLpbProgressColor);
-        mProgressPaint.setStyle(Paint.Style.FILL);
-        if (mLpbProgressImage != null) {
-            BitmapShader progressShader = new BitmapShader(mLpbProgressImage, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
-            mProgressPaint.setShader(progressShader);
-        }
+        mProgressPaint = initImagePaint(mLpbProgressImage, mLpbProgressColor);
     }
 
     private void initTextPaint() {
         mTextPaint = new Paint();
         mTextPaint.setAntiAlias(true);
         mTextPaint.setColor(mLpbProgressTextColor);
+    }
+
+    private Paint initImagePaint(Bitmap bmp, int color) {
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setDither(true);
+        paint.setStyle(Paint.Style.FILL);
+        if (bmp != null) {
+            BitmapShader progressShader = new BitmapShader(bmp, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+            paint.setShader(progressShader);
+        } else {
+            paint.setColor(color);
+        }
+        return paint;
     }
 
     @Override
@@ -163,10 +169,35 @@ public class LineProgressBar extends View {
         drawProgressText(canvas);
     }
 
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        Bundle state = new Bundle();
+        state.putParcelable(KEY_INSTANCE_STATE, super.onSaveInstanceState());
+        state.putInt(KEY_STATE_CURRENT_PROGRESS, mCurrentProgress);
+        state.putBoolean(KEY_STATE_NEED_SHOW_TEXT, mLpbNeedShowText);
+        state.putBoolean(KEY_STATE_NEED_ANIM, mLpbNeedAnim);
+        state.putInt(KEY_STATE_ORIENTATION, mLpbOrientation.getValue());
+        return state;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        if (state instanceof Bundle) {
+            Bundle bundle = (Bundle) state;
+            mCurrentProgress = bundle.getInt(KEY_STATE_CURRENT_PROGRESS);
+            mLpbNeedAnim = bundle.getBoolean(KEY_STATE_NEED_ANIM);
+            mLpbNeedShowText = bundle.getBoolean(KEY_STATE_NEED_SHOW_TEXT);
+            int orientation = bundle.getInt(KEY_STATE_ORIENTATION, 0);
+            mLpbOrientation = orientation == Orientation.vertical.getValue()
+                    ? Orientation.vertical : Orientation.horizontal;
+            super.onRestoreInstanceState(bundle.getParcelable(KEY_INSTANCE_STATE));
+        } else {
+            super.onRestoreInstanceState(state);
+        }
+    }
+
     private void drawBackground(Canvas canvas) {
-        Paint paint = new Paint();
-        paint.setColor(Color.TRANSPARENT);
-        canvas.drawRect(0,0,getWidth(),getHeight(),paint);
+        // todo add default color filter
         canvas.drawRect(0, 0, getWidth(), getHeight(), mBackgroundPaint);
     }
 
@@ -194,36 +225,14 @@ public class LineProgressBar extends View {
 
     private void resizeImageIfNeed() {
         if (mLpbProgressImage == null || mLpbImageWidth == -1 || mLpbImageHeight == -1) return;
-        if (Build.VERSION.SDK_INT >= 19) {
-            mLpbProgressImage.setWidth((int) mLpbImageWidth);
-            mLpbProgressImage.setHeight((int) mLpbImageHeight);
-        } else {
-            mLpbProgressImage = Bitmap.createScaledBitmap(mLpbProgressImage,
-                    (int) mLpbImageWidth, (int) mLpbImageHeight, false);
-        }
+        mLpbProgressImage = resizeImage(mLpbProgressImage);
+        mLpbSecondaryProgressImage = mLpbSecondaryProgressImage == null
+                ? null : resizeImage(mLpbSecondaryProgressImage);
     }
 
-    private Bitmap getBlackWhiteBmp(Bitmap bmp) {
-        if (bmp == null) return null;
-        int width = bmp.getWidth(); // 获取位图的宽
-        int height = bmp.getHeight(); // 获取位图的高
-        int[] pixels = new int[width * height]; // 通过位图的大小创建像素点数组
-        bmp.getPixels(pixels, 0, width, 0, 0, width, height);
-        int alpha = 0xFF << 24;
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                int grey = pixels[width * i + j];
-                int red = ((grey & 0x00FF0000) >> 16);
-                int green = ((grey & 0x0000FF00) >> 8);
-                int blue = (grey & 0x000000FF);
-                grey = (int) (red * 0.3 + green * 0.59 + blue * 0.11);
-                grey = alpha | (grey << 16) | (grey << 8) | grey;
-                pixels[width * i + j] = grey;
-            }
-        }
-        Bitmap newBmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
-        newBmp.setPixels(pixels, 0, width, 0, 0, width, height);
-        return newBmp;
+    private Bitmap resizeImage(Bitmap bmp) {
+        return Bitmap.createScaledBitmap(bmp,
+                (int) mLpbImageWidth, (int) mLpbImageHeight, false);
     }
 
     /**
@@ -243,5 +252,4 @@ public class LineProgressBar extends View {
             invalidateUi();
         }
     }
-
 }
