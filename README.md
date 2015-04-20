@@ -7,7 +7,7 @@ An android ProgressBar widget .
 
 # Gradle
 ```
-compile 'me.tedyin.circleprogressbarlib:circleprogressbarlib:0.5.1'
+compile 'me.tedyin.circleprogressbarlib:circleprogressbarlib:0.6.0'
 ```
 
 # Usage
