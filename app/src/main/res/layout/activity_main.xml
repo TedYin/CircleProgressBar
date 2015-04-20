@@ -39,9 +39,8 @@
         app:lpbProgressImage="@mipmap/icon"
         app:lpbSecondaryProgressImage="@mipmap/icon_black"
         android:layout_width="wrap_content"
-        app:lpbImageWidth="200dp"
-        app:lpbImageHeight="200dp"
-         />
+        app:lpbImageWidth="100dp"
+        app:lpbImageHeight="100dp" />
 
 
     <Button

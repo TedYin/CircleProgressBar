@@ -11,7 +11,9 @@ compile 'me.tedyin.circleprogressbarlib:circleprogressbarlib:0.5.1'
 ```
 
 # Usage
-Layout xml
+## Layout xml
+
+CircleProgressBar
 ```xml
 <me.tedyin.circleprogressbarlib.CircleProgressBar
 	android:layout_width="56dp" 
@@ -26,7 +28,21 @@ Layout xml
     app:cpbNeedShowText="true"/>
 ```
 
-Java Method:
+LineProgressBar
+```xml
+ <me.tedyin.circleprogressbarlib.LineProgressBar
+    android:layout_gravity="center"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent"
+    app:lpbProgressImage="@mipmap/icon"
+    app:lpbSecondaryProgressImage="@mipmap/icon_black"
+    android:layout_width="wrap_content"
+    app:lpbImageWidth="100dp"
+    app:lpbImageHeight="100dp" />
+
+```
+
+## Java Method:
 ```java
 CircleProgressBar bar;
 ...
