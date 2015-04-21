@@ -3,6 +3,7 @@ An android ProgressBar widget .
 
 [ ![Download](https://api.bintray.com/packages/tedyin/maven/CircleProgressBar/images/download.svg) ](https://bintray.com/tedyin/maven/CircleProgressBar/_latestVersion)
 
+## Demo
 ![loading](https://tedyin.github.io/images/loading.gif)
 
 # Gradle
