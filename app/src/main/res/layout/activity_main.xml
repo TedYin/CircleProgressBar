@@ -10,8 +10,8 @@
     <me.tedyin.circleprogressbarlib.CircleProgressBar
         android:id="@+id/bar1"
         app:cpbStrokeWidth="15"
+        app:cpbForegroundColor="#0b90cf"
         app:cpbBackgroundColor="#9000"
-        app:cpbProgressColor="#0b90cf"
         app:cpbProgressTextColor="#ffaabb"
         android:layout_height="56dp"
         android:layout_width="56dp" />
@@ -25,9 +25,13 @@
 
     <me.tedyin.circleprogressbarlib.CircleProgressBar
         android:id="@+id/bar3"
-        app:cpbStrokeWidth="20"
-        app:cpbMaxAngle="270"
-        app:cpbStartAngle="-225"
+        app:cpbStrokeWidth="5"
+        app:cpbMaxAngle="360"
+        app:cpbStartAngle="-90"
+        app:cpbNeedAnim="false"
+        app:cpbForegroundColor="#ffcf0a28"
+        app:cpbProgressTextColor="#ff000000"
+        app:cpbWholeBackgroundColor="#ff5ca5c3"
         android:layout_height="100dp"
         android:layout_width="100dp" />
 

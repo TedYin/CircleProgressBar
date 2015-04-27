@@ -46,18 +46,20 @@ public class CircleProgressBar extends View {
     private static Handler mHandler = new Handler(Looper.getMainLooper());
     private Context mContext;
 
-    private int mCpbProgressColor = Color.parseColor("#0dfb7d");
-    private int mCpbProgressTextColor;
+    private int mCpbWholeBackgroundColor = Color.parseColor("#ffeeeaff");
     private int mCpbBackgroundColor = Color.parseColor("#7df5f5f5");
+    private int mCpbForegroundColor = Color.parseColor("#0dfb7d");
+    private int mCpbProgressTextColor;
     private int mCpbStrokeWidth = 10;// default stroke width
     private int mCpbStartAngle = -90;// default 12 o'clock
     private int mCpbMaxAngle = 360;// default complete circle
     private boolean mCpbNeedAnim = true;// default start anim
     private boolean mCpbNeedShowText = true;// default show text
 
-    private RectF mRectF, mBgRectF;
-    private Paint mCpbBgPaint;
-    private Paint mCpbPaint;
+    private RectF mWholeRectF, mForegroundRectF, mBackgroundRectF;
+    private Paint mCpbWholeBackgroundPaint;
+    private Paint mCpbBackgroundPaint;
+    private Paint mCpbForegroundPaint;
     private Paint mCpbTextPaint;
     private int mAngleStep = 0;
     private int mMinWidth;
@@ -81,7 +83,8 @@ public class CircleProgressBar extends View {
 
     private void parseAttributes(AttributeSet attrs) {
         TypedArray a = mContext.obtainStyledAttributes(attrs, R.styleable.CircleProgressBar);
-        mCpbProgressColor = a.getColor(R.styleable.CircleProgressBar_cpbProgressColor, mCpbProgressColor);
+        mCpbWholeBackgroundColor = a.getColor(R.styleable.CircleProgressBar_cpbWholeBackgroundColor, mCpbWholeBackgroundColor);
+        mCpbForegroundColor = a.getColor(R.styleable.CircleProgressBar_cpbForegroundColor, mCpbForegroundColor);
         mCpbBackgroundColor = a.getColor(R.styleable.CircleProgressBar_cpbBackgroundColor, mCpbBackgroundColor);
         mCpbProgressTextColor = a.getColor(R.styleable.CircleProgressBar_cpbProgressTextColor, mCpbProgressTextColor);
         mCpbStrokeWidth = a.getInt(R.styleable.CircleProgressBar_cpbStrokeWidth, mCpbStrokeWidth);
@@ -91,36 +94,44 @@ public class CircleProgressBar extends View {
         mCpbNeedAnim = a.getBoolean(R.styleable.CircleProgressBar_cpbNeedAnim, mCpbNeedAnim);
 
         mCpbNeedAnim = mCpbMaxAngle % 360 == 0 && mCpbNeedAnim;
-        mCpbProgressTextColor = mCpbProgressTextColor == 0 ? mCpbProgressColor : mCpbProgressTextColor;
+        mCpbProgressTextColor = mCpbProgressTextColor == 0 ? mCpbForegroundColor : mCpbProgressTextColor;
         a.recycle();
     }
 
     private void init() {
-        initBackgroundPaint();
-        initFillPaint();
+        initWholeBackgroundPaint();
+        initProgressBackgroundPaint();
+        initProgressForegroundPaint();
         initTextPaint();
         initRectF();
         initAnim();
     }
 
-    // init background paint
-    private void initBackgroundPaint() {
-        mCpbBgPaint = new Paint();
-        mCpbBgPaint.setAntiAlias(true);
-        mCpbBgPaint.setStyle(Paint.Style.STROKE);
-        mCpbBgPaint.setStrokeWidth(mCpbStrokeWidth);
-        mCpbBgPaint.setColor(mCpbBackgroundColor);
+    // init progress background paint
+    private void initWholeBackgroundPaint() {
+        mCpbWholeBackgroundPaint = new Paint();
+        mCpbWholeBackgroundPaint.setAntiAlias(true);
+        mCpbWholeBackgroundPaint.setColor(mCpbWholeBackgroundColor);
     }
 
-    // init fill paint
-    private void initFillPaint() {
-        mCpbPaint = new Paint();
-        mCpbPaint.setAntiAlias(true);
-        mCpbPaint.setDither(true);
-        mCpbPaint.setStyle(Paint.Style.STROKE);
-        mCpbPaint.setStrokeCap(Paint.Cap.ROUND);
-        mCpbPaint.setStrokeWidth(mCpbStrokeWidth);
-        mCpbPaint.setColor(mCpbProgressColor);
+    // init progress background paint
+    private void initProgressBackgroundPaint() {
+        mCpbBackgroundPaint = new Paint();
+        mCpbBackgroundPaint.setAntiAlias(true);
+        mCpbBackgroundPaint.setStyle(Paint.Style.STROKE);
+        mCpbBackgroundPaint.setStrokeWidth(mCpbStrokeWidth);
+        mCpbBackgroundPaint.setColor(mCpbBackgroundColor);
+    }
+
+    // init progress foreground paint
+    private void initProgressForegroundPaint() {
+        mCpbForegroundPaint = new Paint();
+        mCpbForegroundPaint.setAntiAlias(true);
+        mCpbForegroundPaint.setDither(true);
+        mCpbForegroundPaint.setStyle(Paint.Style.STROKE);
+        mCpbForegroundPaint.setStrokeCap(Paint.Cap.ROUND);
+        mCpbForegroundPaint.setStrokeWidth(mCpbStrokeWidth);
+        mCpbForegroundPaint.setColor(mCpbForegroundColor);
     }
 
     // init text paint
@@ -132,8 +143,9 @@ public class CircleProgressBar extends View {
 
     // init rectF
     private void initRectF() {
-        mBgRectF = new RectF();
-        mRectF = new RectF();
+        mBackgroundRectF = new RectF();
+        mForegroundRectF = new RectF();
+        mWholeRectF = new RectF();
     }
 
     // init Animation Runnable
@@ -174,8 +186,9 @@ public class CircleProgressBar extends View {
             int rTop = mCpbStrokeWidth / 2;
             int rRight = mMinWidth - mCpbStrokeWidth / 2;
             int rBottom = mMinWidth - mCpbStrokeWidth / 2;
-            mBgRectF.set(rLeft, rTop, rRight, rBottom);
-            mRectF.set(rLeft, rTop, rRight, rBottom);
+            mBackgroundRectF.set(rLeft, rTop, rRight, rBottom);
+            mForegroundRectF.set(rLeft, rTop, rRight, rBottom);
+            mWholeRectF.set(mCpbStrokeWidth / 2, mCpbStrokeWidth / 2, mMinWidth - mCpbStrokeWidth / 2, mMinWidth - mCpbStrokeWidth / 2);
             initShader();
         }
     }
@@ -183,13 +196,15 @@ public class CircleProgressBar extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        drawCircleBgProgress(canvas);
-        drawCircleProgress(canvas);
+        drawCpbWholeBackground(canvas);
+        drawCpbBackground(canvas);
+        drawCpbForeground(canvas);
         drawProgressText(canvas);
     }
 
-    private void drawCircleBgProgress(Canvas canvas) {
-        canvas.drawArc(mBgRectF, mCpbStartAngle, mCpbMaxAngle, false, mCpbBgPaint);
+
+    private void drawCpbWholeBackground(Canvas canvas) {
+        canvas.drawCircle(mForegroundRectF.centerX(), mForegroundRectF.centerY(), mForegroundRectF.height() / 2, mCpbWholeBackgroundPaint);
     }
 
     private void drawProgressText(Canvas canvas) {
@@ -205,10 +220,14 @@ public class CircleProgressBar extends View {
         canvas.drawText(text, x, y, mCpbTextPaint);
     }
 
-    private void drawCircleProgress(Canvas canvas) {
+    private void drawCpbForeground(Canvas canvas) {
         int startAngle = mAngleStep + mCpbStartAngle;
         int sweepAngle = (int) ((mCurrentProgress / MAX_PROGRESS) * mCpbMaxAngle);
-        canvas.drawArc(mRectF, startAngle, sweepAngle, false, mCpbPaint);
+        canvas.drawArc(mForegroundRectF, startAngle, sweepAngle, false, mCpbForegroundPaint);
+    }
+
+    private void drawCpbBackground(Canvas canvas) {
+        canvas.drawArc(mBackgroundRectF, mCpbStartAngle, mCpbMaxAngle, false, mCpbBackgroundPaint);
     }
 
     @Override
@@ -278,8 +297,8 @@ public class CircleProgressBar extends View {
     }
 
     private void setShader(Shader shader) {
-        mCpbPaint.setShader(shader);
-        if (mCpbProgressTextColor != mCpbProgressColor || !mCpbNeedShowText) return;
+        mCpbForegroundPaint.setShader(shader);
+        if (mCpbProgressTextColor != mCpbForegroundColor || !mCpbNeedShowText) return;
         mCpbTextPaint.setShader(shader);
     }
 
