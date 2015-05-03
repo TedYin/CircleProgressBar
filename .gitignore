@@ -1,9 +1,10 @@
 .gradle
 /local.properties
-/.idea/workspace.xml
-/.idea/libraries
+/.idea
 .DS_Store
 /build
+/app/build
+/circleprogressbaelib/build
 # Built application files
 *.apk
 *.ap_
