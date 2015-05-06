@@ -8,7 +8,7 @@ An android ProgressBar widget .
 
 # Gradle
 ```
-compile 'me.tedyin.circleprogressbarlib:circleprogressbarlib:0.6.0'
+compile 'me.tedyin.circleprogressbarlib:circleprogressbarlib:0.6.1'
 ```
 
 # Usage
@@ -21,8 +21,9 @@ CircleProgressBar
 	android:layout_height="56dp"
     app:cpbStrokeWidth="10"
     app:cpbBackgroundColor="#9000"
-    app:cpbProgressColor="#0b90cf"
+    app:cpbForegroundColor="#0b90cf"
     app:cpbProgressTextColor="#ffaabb"
+    app:cpbWholeBackgroundColor="#ff5ca5c3"
     app:cpbNeedAnim="true"
     app:cpbStartAngle="-90"
     app:cpbMaxAngle="360"
@@ -59,6 +60,9 @@ bar.setLoadingCallBack(new CircleProgressBar.LoadingCallBack() {
     }
 });
 ```
+# Update log
++ v0.6.1 添加背景颜色设置属性,修改进度颜色属性名称
++ v0.6.0 添加横向进度条
 
 # License
 > Copyright 2015 TedYin

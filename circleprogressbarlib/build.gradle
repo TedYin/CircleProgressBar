@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
-version = "0.6.0"
+version = "0.6.1"
 android {
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
@@ -9,8 +9,8 @@ android {
     defaultConfig {
         minSdkVersion 11
         targetSdkVersion 22
-        versionCode 2
-        versionName "0.6.0"
+        versionCode 3
+        versionName "0.6.1"
     }
     buildTypes {
         release {
@@ -24,9 +24,9 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
 
-def siteUrl = 'https://github.com/TedYin/CircleProgressBar'      // 项目的主页
-def gitUrl = 'https://github.com/TedYin/CircleProgressBar.git'   // Git仓库的url
-group = "me.tedyin.circleprogressbarlib"                                        // Maven Group ID for the artifact，一般填你唯一的包名
+def siteUrl = 'https://github.com/TedYin/CircleProgressBar'
+def gitUrl = 'https://github.com/TedYin/CircleProgressBar.git'
+group = "me.tedyin.circleprogressbarlib"
 install {
     repositories.mavenInstaller {
         // This generates POM.xml with proper parameters
@@ -34,7 +34,7 @@ install {
             project {
                 packaging 'aar'
                 // Add your description here
-                name 'An android ProgressBar widget' 	//项目描述
+                name 'An android ProgressBar widget'
                 url siteUrl
                 // Set your license
                 licenses {
@@ -45,7 +45,7 @@ install {
                 }
                 developers {
                     developer {
-                        id 'TedYin'		//填写的一些基本信息
+                        id 'TedYin'
                         name 'TedYin'
                         email 'tedworld.time@gmail.com'
                     }
@@ -83,7 +83,7 @@ bintray {
     configurations = ['archives']
     pkg {
         repo = "maven"
-        name = "CircleProgressBar"	//发布到JCenter上的项目名字
+        name = "CircleProgressBar"
         websiteUrl = siteUrl
         vcsUrl = gitUrl
         licenses = ["Apache-2.0"]
